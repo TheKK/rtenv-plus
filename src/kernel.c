@@ -719,13 +719,13 @@ void show_cat(int argc, char *argv[])
     char chout[2] = {0};
     int size;
 
-    if (argc == 1) { /* fallback to stdin */
+    if (argc == 1) {
 	    return;
     }
-    else { /* open file of argv[1] */
+    else {
         readfd = open(argv[1], 0);
 
-        if (readfd < 0) { /* Open error */
+        if (readfd < 0) {
             write(fdout, "cat: ", 6);
             write(fdout, argv[1], strlen(argv[1]) + 1);
             write(fdout, ": No such file or directory\r\n", 31);
@@ -735,13 +735,14 @@ void show_cat(int argc, char *argv[])
 
     lseek(readfd, 0, SEEK_SET);
     while ((size = read(readfd, &chload, sizeof(chload))) && size != -1) {
-        if (chload != -1 && chload != 0x04) { /* has something read */
-		chout[0] = char_filter(chload, '.');
+        if (chload != -1 && chload != 0x04) {
+		chout[0] = chload;
+		chout[1] = '\0';
 		write(fdout, chout, 2);
         }
     }
 
-    write(fdout, "\r\n", 3);
+    write(fdout, "\r", 2);
 }
 
 //ls
