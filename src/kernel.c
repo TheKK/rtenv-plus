@@ -52,6 +52,8 @@ void show_task_info(int argc, char *argv[]);
 void show_man_page(int argc, char *argv[]);
 void show_history(int argc, char *argv[]);
 void show_xxd(int argc, char *argv[]);
+void show_cat(int argc, char *argv[]);
+void show_ls(int argc, char *argv[]);
 
 /* Enumeration for command types. */
 enum {
@@ -62,6 +64,8 @@ enum {
 	CMD_MAN,
 	CMD_PS,
 	CMD_XXD,
+	CMD_CAT,
+	CMD_LS,
 	CMD_COUNT
 } CMD_TYPE;
 /* Structure for command handler. */
@@ -78,6 +82,8 @@ const hcmd_entry cmd_data[CMD_COUNT] = {
 	[CMD_MAN] = {.cmd = "man", .func = show_man_page, .description = "Manual pager."},
 	[CMD_PS] = {.cmd = "ps", .func = show_task_info, .description = "List all the processes."},
 	[CMD_XXD] = {.cmd = "xxd", .func = show_xxd, .description = "Make a hexdump."},
+	[CMD_CAT] = {.cmd = "cat", .func = show_cat, .description = "Concatenate files."},
+	[CMD_LS] = {.cmd = "ls", .func = show_ls, .description = "List directory contents."},
 };
 
 /* Structure for environment variables. */
@@ -703,6 +709,44 @@ void show_xxd(int argc, char *argv[])
 
         write(fdout, "\r\n", 3);
     }
+}
+
+//cat
+void show_cat(int argc, char *argv[])
+{
+    int readfd = -1;
+    char chload;
+    char chout[2] = {0};
+    int size;
+
+    if (argc == 1) { /* fallback to stdin */
+	    return;
+    }
+    else { /* open file of argv[1] */
+        readfd = open(argv[1], 0);
+
+        if (readfd < 0) { /* Open error */
+            write(fdout, "cat: ", 6);
+            write(fdout, argv[1], strlen(argv[1]) + 1);
+            write(fdout, ": No such file or directory\r\n", 31);
+            return;
+        }
+    }
+
+    lseek(readfd, 0, SEEK_SET);
+    while ((size = read(readfd, &chload, sizeof(chload))) && size != -1) {
+        if (chload != -1 && chload != 0x04) { /* has something read */
+		chout[0] = char_filter(chload, '.');
+		write(fdout, chout, 2);
+        }
+    }
+
+    write(fdout, "\r\n", 3);
+}
+
+//ls
+void show_ls(int argc, char *argv[])
+{
 }
 
 
