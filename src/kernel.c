@@ -719,7 +719,7 @@ void show_cat(int argc, char *argv[])
     char chout[2] = {0};
     int size;
 
-    if (argc == 1) {
+    if (argc == 1 || argc > 2) {
 	    char usage[] = "Usage: cat [file]\n\r";
 	    write(fdout, usage, 19);
 	    return;
