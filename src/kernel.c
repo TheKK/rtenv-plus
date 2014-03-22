@@ -741,6 +741,9 @@ void show_cat(int argc, char *argv[])
 		chout[0] = chload;
 		chout[1] = '\0';
 		write(fdout, chout, 2);
+
+		if (chout[0] == '\n')
+			write(fdout, "\r", 2);
         }
     }
 
